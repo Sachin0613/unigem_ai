@@ -22,7 +22,7 @@ export const EducationView: React.FC = () => {
       const data = await analyzeEducation(query, imageB64 || undefined, mode);
       setResult(data);
     } catch (e) {
-      alert("Analysis failed.");
+      alert("Analysis failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -91,7 +91,7 @@ export const EducationView: React.FC = () => {
       {result && (
         <div className="space-y-6 animate-fade-in-up">
           {/* GRADER VIEW */}
-          {result.grading && (
+          {mode === 'GRADER' && result.grading && (
             <>
                 <div className="glass-panel p-6 rounded-3xl border-white/10 flex items-center justify-between bg-black/40">
                     <div>
@@ -108,7 +108,7 @@ export const EducationView: React.FC = () => {
                     <p className="text-slate-300 leading-relaxed font-light">{result.grading.feedback}</p>
                 </div>
 
-                {result.grading.corrections.length > 0 && (
+                {result.grading.corrections.length > 0 ? (
                     <div className="space-y-4">
                         <h3 className="font-bold text-white px-2">Corrections & Improvements</h3>
                         {result.grading.corrections.map((corr, idx) => (
@@ -126,19 +126,23 @@ export const EducationView: React.FC = () => {
                             </div>
                         ))}
                     </div>
+                ) : (
+                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-center text-emerald-400 font-bold">
+                        Excellent work! No major corrections found.
+                    </div>
                 )}
             </>
           )}
 
           {/* TUTOR VIEW */}
-          {result.explanation && (
+          {mode === 'TUTOR' && result.explanation && (
             <div className="glass-panel p-8 rounded-3xl border-white/10">
                 <h3 className="font-bold text-white mb-4 flex items-center gap-2 text-lg"><BookOpen size={20}/> Concept Explanation</h3>
                 <p className="text-slate-300 leading-relaxed font-light text-lg">{result.explanation}</p>
             </div>
           )}
 
-          {result.quizQuestions && result.quizQuestions.length > 0 && (
+          {mode === 'TUTOR' && result.quizQuestions && result.quizQuestions.length > 0 && (
             <div className="glass-panel p-6 rounded-3xl bg-blue-900/10 border-blue-500/20">
               <h3 className="font-bold text-blue-300 mb-4">Quick Quiz</h3>
               <ul className="space-y-3">
@@ -152,7 +156,7 @@ export const EducationView: React.FC = () => {
           )}
 
           {/* PLANNER VIEW */}
-          {result.studyPlan && (
+          {mode === 'PLAN' && result.studyPlan && (
             <div className="space-y-4">
                {result.studyPlan.map((day, i) => (
                    <div key={i} className="glass-panel p-5 rounded-2xl border-white/5 hover:border-blue-500/30 transition-all">

@@ -138,9 +138,24 @@ export const analyzeMeds = async (input: string, imageB64?: string): Promise<Med
 
 export const analyzeEducation = async (query: string, imageB64?: string, mode: 'TUTOR' | 'PLAN' | 'GRADER' = 'TUTOR'): Promise<EducationResponse> => {
   let prompt = "";
-  if (mode === 'TUTOR') prompt = `Role: Expert Academic Tutor. Explain this concept clearly, provide 3 practice quiz questions, and suggest related topics for deep diving. Query: ${query}`;
-  else if (mode === 'PLAN') prompt = `Role: Productive Study Coach. Create a detailed 5-day study plan. For each day, provide a "Focus Theme" and a list of specific, actionable tasks with time estimates. Query: ${query}`;
-  else prompt = `Role: Strict Academic Grader. Analyze this assignment. Provide a Letter Grade (A-F). List corrections with specific reasons (cite grammar or logic rules). Write a constructive "Feedback Sandwich" (Praise-Critique-Praise). Input: ${query}`;
+  if (mode === 'TUTOR') {
+    prompt = `Role: Expert Academic Tutor. Explain this concept clearly, provide 3 practice quiz questions, and suggest related topics for deep diving. Query: ${query}`;
+  } else if (mode === 'PLAN') {
+    prompt = `Role: Productive Study Coach. Create a detailed 5-day study plan. For each day, provide a "Focus Theme" and a list of specific, actionable tasks with time estimates. Query: ${query}`;
+  } else {
+    // GRADER MODE - Enforced Prompt
+    prompt = `
+      Role: Strict Academic Grader. 
+      Task: Analyze the student's submission (text or image). 
+      Instructions:
+      1. Assign a Letter Grade (A, B, C, D, or F).
+      2. Identify at least 3 specific errors or areas for improvement. For each, quote the 'original' text, provide the 'correction', and explain the 'reason' (grammar, logic, factual error).
+      3. Write a 'feedback' summary using the Sandwich Method (Praise -> Critique -> Praise).
+      
+      IMPORTANT: You MUST populate the 'grading' field in the JSON response. Do not use 'explanation'.
+      Input: ${query}
+    `;
+  }
 
   const parts: any[] = [{ text: prompt }];
   if (imageB64) parts.push({ inlineData: { mimeType: "image/jpeg", data: imageB64 } });

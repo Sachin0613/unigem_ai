@@ -266,10 +266,11 @@ const Dashboard = ({ onSelect }: { onSelect: (m: ModuleType) => void }) => {
             className="group relative glass-panel p-8 rounded-[2rem] text-left overflow-hidden hover:z-10"
             style={{ animationDelay: `${idx * 100}ms` }}
           >
-            {/* Inner Glow */}
-            <div className={`absolute top-0 right-0 w-64 h-64 bg-${app.color}-500/10 blur-[80px] rounded-full group-hover:bg-${app.color}-500/20 transition-all duration-700`} />
+            {/* Inner Glow - pointer events none to allow click-through */}
+            <div className={`absolute top-0 right-0 w-64 h-64 bg-${app.color}-500/10 blur-[80px] rounded-full group-hover:bg-${app.color}-500/20 transition-all duration-700 pointer-events-none`} />
             
-            <div className="relative z-10 flex flex-col h-full">
+            <div className="relative z-10 flex flex-col h-full pointer-events-none"> 
+              {/* Content is pointer-events-none so click registers on button parent, or button handles bubbling */}
               <div className={`mb-6 p-4 rounded-2xl w-fit bg-gradient-to-br from-white/10 to-transparent border border-white/5 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(0,0,0,0.2)]`}>
                 {app.icon}
               </div>
@@ -288,8 +289,8 @@ const Dashboard = ({ onSelect }: { onSelect: (m: ModuleType) => void }) => {
               </div>
             </div>
             
-            {/* Border Glow on Hover */}
-            <div className={`absolute inset-0 border border-${app.color}-500/0 group-hover:border-${app.color}-500/30 rounded-[2rem] transition-colors duration-500`} />
+            {/* Border Glow on Hover - pointer events none */}
+            <div className={`absolute inset-0 border border-${app.color}-500/0 group-hover:border-${app.color}-500/30 rounded-[2rem] transition-colors duration-500 pointer-events-none`} />
           </button>
         ))}
       </div>
@@ -322,27 +323,27 @@ const Footer = ({ onSelect }: { onSelect: (m: ModuleType) => void }) => {
           <div>
             <h4 className="font-bold text-white mb-6 text-xs tracking-[0.2em] uppercase text-cyan-500">Solutions</h4>
             <ul className="space-y-3 text-sm text-slate-400">
-              <li><button onClick={() => onSelect('HEALTH')} className="hover:text-emerald-400 transition-colors flex items-center gap-2">Health Copilot</button></li>
-              <li><button onClick={() => onSelect('EDUCATION')} className="hover:text-blue-400 transition-colors flex items-center gap-2">Education Tutor</button></li>
-              <li><button onClick={() => onSelect('ACCESSIBILITY')} className="hover:text-purple-400 transition-colors flex items-center gap-2">Accessibility</button></li>
+              <li><button onClick={() => onSelect('HEALTH')} className="hover:text-emerald-400 transition-colors flex items-center gap-2"><Heart size={16}/> Health Copilot</button></li>
+              <li><button onClick={() => onSelect('EDUCATION')} className="hover:text-blue-400 transition-colors flex items-center gap-2"><GraduationCap size={16}/> Education Tutor</button></li>
+              <li><button onClick={() => onSelect('ACCESSIBILITY')} className="hover:text-purple-400 transition-colors flex items-center gap-2"><Eye size={16}/> Accessibility</button></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-bold text-white mb-6 text-xs tracking-[0.2em] uppercase text-purple-500">Enterprise</h4>
             <ul className="space-y-3 text-sm text-slate-400">
-              <li><button onClick={() => onSelect('SCIENCE')} className="hover:text-cyan-400 transition-colors flex items-center gap-2">Research Lab</button></li>
-              <li><button onClick={() => onSelect('BUSINESS')} className="hover:text-amber-400 transition-colors flex items-center gap-2">Business Ops</button></li>
-              <li><button onClick={() => onSelect('TECH')} className="hover:text-pink-400 transition-colors flex items-center gap-2">Dev Studio</button></li>
+              <li><button onClick={() => onSelect('SCIENCE')} className="hover:text-cyan-400 transition-colors flex items-center gap-2"><Microscope size={16}/> Research Lab</button></li>
+              <li><button onClick={() => onSelect('BUSINESS')} className="hover:text-amber-400 transition-colors flex items-center gap-2"><Briefcase size={16}/> Business Ops</button></li>
+              <li><button onClick={() => onSelect('TECH')} className="hover:text-pink-400 transition-colors flex items-center gap-2"><Terminal size={16}/> Dev Studio</button></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-bold text-white mb-6 text-xs tracking-[0.2em] uppercase text-slate-500">Company</h4>
             <ul className="space-y-3 text-sm text-slate-400">
-              <li><button onClick={() => onSelect('DOCS')} className="hover:text-white transition-colors">Documentation</button></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Legal</a></li>
+              <li><button onClick={() => onSelect('DOCS')} className="hover:text-white transition-colors flex items-center gap-2"><Layers size={16}/> Documentation</button></li>
+              <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">Privacy</a></li>
+              <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">Legal</a></li>
             </ul>
           </div>
 
