@@ -13,20 +13,24 @@ import {
 } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-const MODEL_NAME = "gemini-2.5-flash";
 
-// --- CHAT ---
+// MODEL STRATEGY
+const FAST_MODEL = "gemini-2.0-flash-lite-preview-02-05"; // Corrected Model Name for Flash Lite
+const STD_MODEL = "gemini-2.5-flash"; // Standard Multimodal Tools
+const REASONING_MODEL = "gemini-3-pro-preview"; // Deep Thinking (Science, Tech, Health Triage)
+
+// --- CHAT (FAST AI) ---
 
 export const createChatSession = (): Chat => {
   return ai.chats.create({
-    model: MODEL_NAME,
+    model: FAST_MODEL,
     config: {
       systemInstruction: "You are UniGem AI, a universal multimodal assistant. You have deep expertise in Health, Education, Accessibility, Science, Business, and Technology. Your goal is to provide real-time, helpful, and concise answers. Format your responses cleanly. Use bolding (double asterisks) only for key terms. Use bullet points (single asterisk) for lists. Avoid unnecessary decorative symbols or excessive markdown.",
     },
   });
 };
 
-// --- HEALTH ---
+// --- HEALTH (REASONING + STD) ---
 
 export const analyzeTriageCase = async (symptoms: string, imageB64?: string, audioB64?: string): Promise<TriageResponse> => {
   const parts: any[] = [];
@@ -47,11 +51,12 @@ export const analyzeTriageCase = async (symptoms: string, imageB64?: string, aud
   if (imageB64) parts.push({ inlineData: { mimeType: "image/jpeg", data: imageB64 } });
   if (audioB64) parts.push({ inlineData: { mimeType: "audio/webm", data: audioB64 } });
 
+  // Use REASONING MODEL for Triage to ensure safety and depth
   const response = await ai.models.generateContent({
-    model: MODEL_NAME,
+    model: REASONING_MODEL,
     contents: { parts },
     config: {
-      thinkingConfig: { thinkingBudget: 0 },
+      thinkingConfig: { thinkingBudget: 32768 }, // MAX THINKING FOR SAFETY
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
@@ -81,11 +86,12 @@ export const analyzeChronicLog = async (notes: string, imageB64?: string): Promi
     Input: ${notes}
   ` }];
   if (imageB64) parts.push({ inlineData: { mimeType: "image/jpeg", data: imageB64 } });
+  
+  // Standard Model is sufficient for logging
   const response = await ai.models.generateContent({
-    model: MODEL_NAME,
+    model: STD_MODEL,
     contents: { parts },
     config: {
-      thinkingConfig: { thinkingBudget: 0 },
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
@@ -115,10 +121,9 @@ export const analyzeMeds = async (input: string, imageB64?: string): Promise<Med
     if (imageB64) parts.push({ inlineData: { mimeType: "image/jpeg", data: imageB64 } });
   
     const response = await ai.models.generateContent({
-      model: MODEL_NAME,
+      model: STD_MODEL,
       contents: { parts },
       config: {
-        thinkingConfig: { thinkingBudget: 0 },
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -134,7 +139,7 @@ export const analyzeMeds = async (input: string, imageB64?: string): Promise<Med
     return JSON.parse(response.text || "{}");
   };
 
-// --- EDUCATION ---
+// --- EDUCATION (STD) ---
 
 export const analyzeEducation = async (query: string, imageB64?: string, mode: 'TUTOR' | 'PLAN' | 'GRADER' = 'TUTOR'): Promise<EducationResponse> => {
   let prompt = "";
@@ -143,7 +148,6 @@ export const analyzeEducation = async (query: string, imageB64?: string, mode: '
   } else if (mode === 'PLAN') {
     prompt = `Role: Productive Study Coach. Create a detailed 5-day study plan. For each day, provide a "Focus Theme" and a list of specific, actionable tasks with time estimates. Query: ${query}`;
   } else {
-    // GRADER MODE - Enforced Prompt
     prompt = `
       Role: Strict Academic Grader. 
       Task: Analyze the student's submission (text or image). 
@@ -151,8 +155,6 @@ export const analyzeEducation = async (query: string, imageB64?: string, mode: '
       1. Assign a Letter Grade (A, B, C, D, or F).
       2. Identify at least 3 specific errors or areas for improvement. For each, quote the 'original' text, provide the 'correction', and explain the 'reason' (grammar, logic, factual error).
       3. Write a 'feedback' summary using the Sandwich Method (Praise -> Critique -> Praise).
-      
-      IMPORTANT: You MUST populate the 'grading' field in the JSON response. Do not use 'explanation'.
       Input: ${query}
     `;
   }
@@ -161,10 +163,9 @@ export const analyzeEducation = async (query: string, imageB64?: string, mode: '
   if (imageB64) parts.push({ inlineData: { mimeType: "image/jpeg", data: imageB64 } });
 
   const response = await ai.models.generateContent({
-    model: MODEL_NAME,
+    model: STD_MODEL,
     contents: { parts },
     config: {
-      thinkingConfig: { thinkingBudget: 0 },
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
@@ -188,7 +189,7 @@ export const analyzeEducation = async (query: string, imageB64?: string, mode: '
   return JSON.parse(response.text || "{}");
 };
 
-// --- ACCESSIBILITY ---
+// --- ACCESSIBILITY (STD) ---
 
 export const analyzeAccessibility = async (instructions: string, imageB64?: string, mode: 'GENERAL' | 'NAV' = 'GENERAL'): Promise<AccessibilityResponse> => {
   const parts: any[] = [];
@@ -209,10 +210,9 @@ export const analyzeAccessibility = async (instructions: string, imageB64?: stri
   if (imageB64) parts.push({ inlineData: { mimeType: "image/jpeg", data: imageB64 } });
 
   const response = await ai.models.generateContent({
-    model: MODEL_NAME,
+    model: STD_MODEL,
     contents: { parts },
     config: {
-      thinkingConfig: { thinkingBudget: 0 },
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
@@ -236,22 +236,23 @@ export const analyzeAccessibility = async (instructions: string, imageB64?: stri
   return JSON.parse(response.text || "{}");
 };
 
-// --- SCIENCE ---
+// --- SCIENCE (REASONING) ---
 
 export const analyzeScience = async (text: string, imageB64?: string, mode: 'ANALYSIS' | 'DATA' | 'SIM' = 'ANALYSIS'): Promise<ScienceResponse> => {
   let prompt = "";
   if (mode === 'ANALYSIS') prompt = `Role: Senior Research Scientist. Analyze this abstract/paper. Summarize key findings. Propose 3 novel hypotheses based on this work. Critique the methodology for flaws/bias. Input: ${text}`;
   else if (mode === 'DATA') prompt = `Role: Data Scientist. Extract data from this chart/table. Output a Markdown table. List 3 key statistical insights or trends observed in the data. Input: ${text}`;
-  else prompt = `Role: Lab Safety Officer & Chemist. Simulate this experiment. Predict the reaction/outcome. List specific safety risks (explosive, toxic). Describe step-by-step what happens visually. Input: ${text}`;
+  else prompt = `Role: Lab Safety Officer & Chemist. Simulate this experiment based on the description. Predict the chemical/physical reaction. List specific safety risks (explosive, toxic). Describe step-by-step what happens. Input: ${text}`;
 
   const parts: any[] = [{ text: prompt }];
   if (imageB64) parts.push({ inlineData: { mimeType: "image/jpeg", data: imageB64 } });
 
+  // Use REASONING MODEL for Simulation and deep analysis
   const response = await ai.models.generateContent({
-    model: MODEL_NAME,
+    model: REASONING_MODEL,
     contents: { parts },
     config: {
-      thinkingConfig: { thinkingBudget: 0 },
+      thinkingConfig: { thinkingBudget: 32768 },
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
@@ -276,7 +277,7 @@ export const analyzeScience = async (text: string, imageB64?: string, mode: 'ANA
   return JSON.parse(response.text || "{}");
 };
 
-// --- BUSINESS ---
+// --- BUSINESS (STD) ---
 
 export const analyzeBusiness = async (query: string, imageB64?: string, mode: 'WORKFLOW' | 'MEETING' | 'CONTRACT' = 'WORKFLOW'): Promise<BusinessResponse> => {
   let prompt = "";
@@ -288,10 +289,9 @@ export const analyzeBusiness = async (query: string, imageB64?: string, mode: 'W
   if (imageB64) parts.push({ inlineData: { mimeType: "image/jpeg", data: imageB64 } });
 
   const response = await ai.models.generateContent({
-    model: MODEL_NAME,
+    model: STD_MODEL,
     contents: { parts },
     config: {
-      thinkingConfig: { thinkingBudget: 0 },
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
@@ -316,7 +316,7 @@ export const analyzeBusiness = async (query: string, imageB64?: string, mode: 'W
   return JSON.parse(response.text || "{}");
 };
 
-// --- TECHNOLOGY ---
+// --- TECHNOLOGY (REASONING) ---
 
 export const analyzeTech = async (codeSnippet: string, mode: 'REFACTOR' | 'DEBUG' | 'SECURITY' = 'REFACTOR'): Promise<TechResponse> => {
   let prompt = "";
@@ -326,11 +326,12 @@ export const analyzeTech = async (codeSnippet: string, mode: 'REFACTOR' | 'DEBUG
   
   const parts: any[] = [{ text: prompt }];
   
+  // Use REASONING MODEL for deep Code Analysis
   const response = await ai.models.generateContent({
-    model: MODEL_NAME,
+    model: REASONING_MODEL,
     contents: { parts },
     config: {
-      thinkingConfig: { thinkingBudget: 0 },
+      thinkingConfig: { thinkingBudget: 32768 },
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,

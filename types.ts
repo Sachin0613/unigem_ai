@@ -112,5 +112,6 @@ export interface ChatMessage {
   id: string;
   role: 'user' | 'model';
   text: string;
+  image?: string; // Base64 string for image preview
   timestamp: Date;
 }

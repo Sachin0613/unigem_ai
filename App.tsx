@@ -164,7 +164,7 @@ function App() {
         <div className="flex items-center gap-4">
           <div className="hidden md:flex px-4 py-1.5 bg-gradient-to-r from-cyan-900/20 to-purple-900/20 rounded-full border border-cyan-500/30 items-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.15)] group hover:border-cyan-400/50 transition-all">
             <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#00E6FF]"></div> 
-            <span className="text-xs font-bold text-cyan-100 tracking-wider">POWERED BY GEMINI 3</span>
+            <span className="text-xs font-bold text-cyan-100 tracking-wider">POWERED BY GEMINI 3 PRO</span>
           </div>
         </div>
       </header>
@@ -232,7 +232,7 @@ const Dashboard = ({ onSelect }: { onSelect: (m: ModuleType) => void }) => {
         </h1>
         
         <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-light">
-          The <span className="text-cyan-300 font-normal">Gemini 3</span> powered universal copilot. 
+          The <span className="text-cyan-300 font-normal">Gemini 3 Pro</span> powered universal copilot. 
           Seamlessly bridging multimodal reasoning across <span className="text-white">six</span> critical domains.
         </p>
 
@@ -311,12 +311,16 @@ const Footer = ({ onSelect }: { onSelect: (m: ModuleType) => void }) => {
             </div>
             <p className="text-xs leading-relaxed text-slate-500 max-w-xs">
               Next-generation multimodal intelligence interface. 
-              Running on advanced Gemini 3 architectures.
+              Running on advanced Gemini 3 Pro architectures.
             </p>
             <div className="flex gap-4 opacity-60">
                <Twitter size={18} className="hover:text-cyan-400 cursor-pointer transition-colors" />
-               <Github size={18} className="hover:text-white cursor-pointer transition-colors" />
-               <Linkedin size={18} className="hover:text-blue-400 cursor-pointer transition-colors" />
+               <a href="https://github.com/Sachin0613/unigem_ai" target="_blank" rel="noopener noreferrer">
+                 <Github size={18} className="hover:text-white cursor-pointer transition-colors" />
+               </a>
+               <a href="https://www.linkedin.com/in/sachin-yadav-631b6031a/" target="_blank" rel="noopener noreferrer">
+                 <Linkedin size={18} className="hover:text-blue-400 cursor-pointer transition-colors" />
+               </a>
             </div>
           </div>
 
@@ -349,7 +353,7 @@ const Footer = ({ onSelect }: { onSelect: (m: ModuleType) => void }) => {
 
         </div>
         
-        <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-600 uppercase tracking-widest">
+        <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-300 uppercase tracking-widest">
            <p>© 2025 UniGem AI Systems. All rights reserved.</p>
            <p className="mt-2 md:mt-0 flex items-center gap-2"><Globe size={12}/> Global Node: US-EAST-1</p>
         </div>
