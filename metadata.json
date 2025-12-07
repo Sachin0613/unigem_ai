@@ -1,0 +1,8 @@
+{
+  "name": "UniGem AI - Universal Multimodal Copilot",
+  "description": "A comprehensive AI assistant for Health, Education, Accessibility, Science, Business, and Technology using Gemini 2.5 Flash for high-speed analysis.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
